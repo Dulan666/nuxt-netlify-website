@@ -2,32 +2,38 @@
   <section class="container">
     <h2>Blog</h2>
     <ul>
-      <li v-for="post in posts" :key="post.date">
-        <nuxt-link :to="post._path">
-          {{ post.title }}
-        </nuxt-link>
-      </li>
+      <li v-for="post in posts" :key="post.id">{{ post.title }}</li>
     </ul>
   </section>
 </template>
 
 <script>
 import AppLogo from '~/components/AppLogo.vue';
-
 export default {
   components: {
     AppLogo
   },
   data() {
-    // Using webpacks context to gather all files from a folder
-    const context = require.context('~/content/blog/posts/', false, /\.json$/);
+    return {
+    posts: null
+    }
+    
+  },
+  created() {
+    this.load()
+  },
+  methods: {
+    load() {
+       // GET /someUrl
+      this.$http.get('https://jsonplaceholder.typicode.com/posts').then(response => {
 
-    const posts = context.keys().map(key => ({
-      ...context(key),
-      _path: `/blog/${key.replace('.json', '').replace('./', '')}`
-    }));
+        // get body data
+        this.posts = response.body
 
-    return { posts };
+      }, response => {
+        // error callback
+      });
+    }
   }
 };
 </script>
